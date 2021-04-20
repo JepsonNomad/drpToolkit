@@ -4,9 +4,9 @@
 
 drpToolkit is a digital repeat photography ("time-lapse") imagery management and analysis package for Python. With this package, you can:
 
--Get imagery into a useful file structure (`prep.py`)
--Align imagery to a common keyframe (`align.py`)
--Extract greenness from regions of interest (`extract.py`)
+- Get imagery into a useful file structure (`prep.py`)
+- Align imagery to a common keyframe (`align.py`)
+- Extract greenness from regions of interest (`extract.py`)
 
 The motivation for this is my own work applying digital repeat photography in phenology research. There are several other applications for which it may be useful, in particular those with goals relating to change detection.
 
