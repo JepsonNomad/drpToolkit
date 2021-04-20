@@ -5,7 +5,7 @@ setup(
     url='https://github.com/jepsonnomad/drpToolkit',
     author='Christian John',
     author_email='cjohn@ucdavis.edu',
-    packages=['drpToolkit'],
+    packages=find_packages(),
     install_requires=['numpy'],
     version='0.0.0.9000',
     license='Gnu GPL 3.0',
