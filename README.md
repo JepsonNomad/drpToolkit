@@ -24,7 +24,9 @@ For now, please cite the github package directly.
 
 `conda activate drpToolkit`
 
-Once the environment is activated, you can use the scripts in `drpToolkit_scripts/`. To call functions directly in Python, you will need to install using pip.
+Once the environment is activated, you can use the scripts in `drpToolkit_scripts/`. To call functions directly in Python, you will need to install using pip:
+
+`pip3 install git+https://github.com/JepsonNomad/drpToolkit.git`
 
 
 ## Examples
