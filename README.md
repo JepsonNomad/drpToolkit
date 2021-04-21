@@ -41,7 +41,7 @@ The workflow is as follows: First, prepare imagery for alignment by copying imag
 
 `prep -i data/img -g '*.JPG' -s 'GB' -p '03' --xmin 0 --xmax 4224 --ymin 0 --ymax 2217 --width 4224  --height 2217 -o 'prepped'`
 
-Next, align images to a common reference image ("keyframe"). This step is computationally expensive and will take a while, especially for datasets that contain many pictures and/or datasets with large pictures. If desired, a reference image mask (-m) can be used, which defines acceptable areas of the image in which keypoints can be identified.
+Next, align images to a common reference image ("keyframe"). Note that the keyframe should match the resolution of the prepped imagery; it may be useful to select an image directly from the prepped imagery to use as a keyframe and, down the line, a basis for ROI definitions. The alignment step is computationally expensive and will take a while, especially for datasets that contain many pictures and/or datasets with large pictures. If desired, a reference image mask (-m) can be used, which defines acceptable areas of the image in which keypoints can be identified.
 
 `align -i data/img/prepped/ -k data/img/prepped/GB-03_2018_08_14_120000.JPG -o aligned`
 
@@ -51,7 +51,7 @@ At this point I recommend checking the alignment. I use [ffmpeg](https://www.ffm
 
 If the alignment looks good, greenness within a set of regions of interest can be extracted. Greenness extraction produces a [tidy](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) dataset with a row for each image/ROI pair (so nrows = nImg*nROI). 
 
-`extract -i data/img/prepped/aligned -g *.JPG -r data/roi/ROIs.csv`
+`extract -i data/img/prepped/aligned -g '*.JPG' -r data/roi/ROIs.csv`
 
 It's possible that you will get RuntimeWarnings during `extract` if an ROI overlaps with empty space in a realigned image. You can identify which region(s) lost coverage in the imagery using the `GCC.csv` output file from `extract` or from the `pd.DataFrame` returned by `extract.imgGCC()` and `extract.foldGCC()`.
 

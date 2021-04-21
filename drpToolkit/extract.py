@@ -237,7 +237,7 @@ def main():
     imgFPs = glob.glob(args.globString)
     imgFPs = sorted(imgFPs)
     # Prep ROI
-    roiIDs, roiSPs, roiPolys = prepROI(roiFP = args.ROIs)
+    roiIDs, roiSPs, roiPolys = prepROI(roiFP = os.path.abspath(args.ROIs))
     # Prep sitePlot info
     sitePlot = args.sitename + "-" + args.plotID
     # Run GCC extraction on folder
