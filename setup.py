@@ -12,5 +12,10 @@ setup(
     license='Gnu GPL 3.0',
     description='Digital repeat photography imagery management and analysis',
     long_description=open('README.md').read(),
-    scripts=['drpToolkit_scripts/prep.py','drpToolkit_scripts/align.py','drpToolkit_scripts/extract.py','drpToolkit_scripts/panelize.py']
+    entry_points = {
+        'console_scripts': ['drpPrep=drpToolkit.prep:main',
+        'drpAlign=drpToolkit.align:main',
+        'drpExtract=drpToolkit.extract:main',
+        'drpPanelize=drpToolkit.panelize:main']
+    }
 )
