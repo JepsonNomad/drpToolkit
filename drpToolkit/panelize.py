@@ -182,7 +182,7 @@ def main():
     print("Output folder: " + outfolder)
     if not os.path.exists(outfolder):
         os.mkdir(outfolder)
-    foldPanelize(imgFPs = imgFPs, roiPolys = roiPolys, indicesDF = extract_df, outdir = panelFolder)
+    foldPanelize(imgFPs = imgFPs, roiPolys = roiPolys, indicesDF = extract_df, outdir = outfolder)
     # Final benchmark
     stopTime = datetime.now()
     print("Elapsed time: " + str(stopTime - startTime))

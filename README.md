@@ -51,17 +51,17 @@ Next, align images to a common reference image ("keyframe"). Note that the keyfr
 
 At this point I recommend checking the alignment. I use [ffmpeg](https://www.ffmpeg.org/) to compile all aligned images into a single time-lapse video, e.g. using:
 
-`ffmpeg -pattern_type glob -i './prepped/aligned/*.JPG' -r 12 -s hd1080 -crf 32 -vcodec h264 -pix_fmt yuv420p -loglevel warning './TIMELAPSE.mp4'`
+`ffmpeg -pattern_type glob -i './img/prepped/aligned/*.JPG' -r 12 -s hd1080 -crf 32 -vcodec h264 -pix_fmt yuv420p -loglevel warning './TIMELAPSE.mp4'`
 
 If the alignment looks good, greenness within a set of regions of interest can be extracted. Greenness extraction produces a [tidy](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) dataset with a row for each image/ROI pair (so nrows = nImg*nROI). 
 
-`extract -i ./prepped/aligned -g '*.JPG' -r ./roi/roi.csv`
+`extract -i ./img/prepped/aligned -g '*.JPG' -r ./roi/roi.csv`
 
 It's possible that you will get RuntimeWarnings during `extract` if an ROI overlaps with empty space in a realigned image. You can identify which region(s) lost coverage in the imagery using the `GCC.csv` output file from `extract` or from the `pd.DataFrame` returned by `extract.imgGCC()` and `extract.foldGCC()`.
 
 After extraction, users may wish to compile the data into a nicely formatted visualization. `drpToolkit` lends some support to this goal, by panelizing each image with the data leading up to the capture time of that image. The panelize script simultaneously imports ROIs (-r) using the same functionality as `extract`, and plots image indices in matching colors:
 
-`panelize -i ./prepped/aligned -t ./prepped/aligned/extract.csv -r ./rois/roi.csv -o panelized`
+`panelize -i ./img/prepped/aligned -t ./img/prepped/aligned/extract.csv -r ./roi/roi.csv -o panelized`
 
 The frames generated through this can then be compiled in a time-lapse video with the same  `ffmpeg` approach as was used for the aligned imagery.
 
