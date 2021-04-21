@@ -162,16 +162,16 @@ def main():
     startTime = datetime.now()
     # Find image directory
     imDir = os.path.abspath(args.imgDir)
+    # Import indices DataFrame
+    dfPath = args.table
+    extract_df = pd.read_csv(os.path.abspath(dfPath))
+    # Prep ROI
+    roiIDs, roiSPs, roiPolys = prepROI(roiFP = os.path.abspath(args.ROIs))
     # Navigate to directory
     os.chdir(imDir)
     # Find and sort images
     imgFPs = glob.glob(args.globString)
     imgFPs = sorted(imgFPs)
-    # Import indices DataFrame
-    dfPath = args.table
-    extract_df = pd.read_csv(dfPath)
-    # Prep ROI
-    roiIDs, roiSPs, roiPolys = prepROI(roiFP = args.ROIs)
     # Generate output plots
     panelFolder = os.path.join(imDir, "panelized")
     if not os.path.exists(panelFolder):
