@@ -1,0 +1,11 @@
+# Navigate to directory
+cd PATH/TO/DIR
+
+# Use toolkit
+prep -i ./img -g '*.JPG' -s 'GB' -p '03' --xmin 0 --xmax 4224 --ymin 0 --ymax 2216 --width 2112 --height 1108 -o 'prepped'
+align -i ./img/prepped/ -k ./roi/reference.JPG -o aligned
+extract -i ./img/prepped/aligned -g '*.JPG' -r ./roi/roi.csv
+panelize -i ./img/prepped/aligned -t ./img/prepped/aligned/extract.csv -r ./roi/roi.csv -o panelized
+
+# And if you want, compile into a timelapse video:
+# ffmpeg -pattern_type glob -i ./img/prepped/aligned/panelized/*.JPG -r 12 -s hd1080 -crf 32 -vcodec h264 -pix_fmt yuv420p -loglevel warning TIMELAPSE_panelized_1200.mp4
