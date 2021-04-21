@@ -230,7 +230,7 @@ def main():
     # Benchmark
     startTime = datetime.now()
     # Find image directory
-    imDir = args.imgDir
+    imDir = os.path.abspath(args.imgDir)
     # Navigate to directory
     os.chdir(imDir)
     # Find and sort images
