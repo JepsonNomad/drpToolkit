@@ -4,9 +4,9 @@
 
 drpToolkit is a digital repeat photography ("time-lapse") imagery management and analysis package for Python. With this package, you can:
 
-- Get imagery into a useful file structure (`prep.py`)
-- Align imagery to a common keyframe (`align.py`)
-- Extract greenness from regions of interest (`extract.py`)
+- Get imagery into a useful file structure (`drpToolkit.prep`)
+- Align imagery to a common keyframe (`drpToolkit.align`)
+- Extract greenness from regions of interest (`drpToolkit.extract`)
 
 The motivation for this is my own work applying digital repeat photography in phenology research. There are several other applications for which it may be useful, in particular those with goals relating to change detection.
 
@@ -53,7 +53,7 @@ If the alignment looks good, greenness within a set of regions of interest can b
 
 `extract -i data/img/prepped/aligned -g *.JPG -r data/roi/ROIs.csv`
 
-It's possible that you will get RuntimeWarnings during `extract.py` if an ROI overlaps with empty space in a realigned image. You can identify which region(s) lost coverage in the imagery using the `GCC.csv` output file from `extract.py` or from the `pd.DataFrame` returned by `extract.imgGCC()` and `extract.foldGCC()`.
+It's possible that you will get RuntimeWarnings during `extract` if an ROI overlaps with empty space in a realigned image. You can identify which region(s) lost coverage in the imagery using the `GCC.csv` output file from `extract` or from the `pd.DataFrame` returned by `extract.imgGCC()` and `extract.foldGCC()`.
 
 After extraction, users may wish to compile the data into a nicely formatted visualization. `drpToolkit` lends some support to this goal, by panelizing each image with the data leading up to the capture time of that image. The panelize script simultaneously imports ROIs (-r) using the same functionality as `extract`, and plots image indices in matching colors:
 
@@ -61,6 +61,7 @@ After extraction, users may wish to compile the data into a nicely formatted vis
 `
 
 The frames generated through this can then be compiled in a time-lapse video with the same  `ffmpeg` approach as was used for the aligned imagery.
+
 
 ## Version
 
