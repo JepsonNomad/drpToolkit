@@ -13,9 +13,9 @@ setup(
     description='Digital repeat photography imagery management and analysis',
     long_description=open('README.md').read(),
     entry_points = {
-        'console_scripts': ['drpPrep=drpToolkit.prep:main',
-        'drpAlign=drpToolkit.align:main',
-        'drpExtract=drpToolkit.extract:main',
-        'drpPanelize=drpToolkit.panelize:main']
+        'console_scripts': ['prep=drpToolkit.prep:main',
+        'align=drpToolkit.align:main',
+        'extract=drpToolkit.extract:main',
+        'panelize=drpToolkit.panelize:main']
     }
 )
