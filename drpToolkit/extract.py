@@ -231,13 +231,13 @@ def main():
     startTime = datetime.now()
     # Find image directory
     imDir = os.path.abspath(args.imgDir)
+    # Prep ROI
+    roiIDs, roiSPs, roiPolys = prepROI(roiFP = os.path.abspath(args.ROIs))
     # Navigate to directory
     os.chdir(imDir)
     # Find and sort images
     imgFPs = glob.glob(args.globString)
     imgFPs = sorted(imgFPs)
-    # Prep ROI
-    roiIDs, roiSPs, roiPolys = prepROI(roiFP = os.path.abspath(args.ROIs))
     # Prep sitePlot info
     sitePlot = args.sitename + "-" + args.plotID
     # Run GCC extraction on folder
