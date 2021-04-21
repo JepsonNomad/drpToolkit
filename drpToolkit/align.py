@@ -220,6 +220,8 @@ def main():
     startTime = datetime.now()
     # Find image directory
     imDir = os.path.abspath(args.imgDir)
+    # Find keyframe
+    keyframeFullPath = os.path.abspath(args.keyframeFP)
     # Navigate to directory
     os.chdir(imDir)
     # Find and sort images
@@ -231,7 +233,7 @@ def main():
     if not os.path.exists(outfolder):
 	    os.mkdir(outfolder)
     # Identify transform
-    tt = generateTransformTable(keyframeFP = args.keyframeFP, imageFPs = imgFPs, refMaskFP = args.refMaskFP, transModel = args.transModel, rRT = args.rRT, lRT = args.lRT, outdir = outfolder)
+    tt = generateTransformTable(keyframeFP = keyframeFullPath, imageFPs = imgFPs, refMaskFP = args.refMaskFP, transModel = args.transModel, rRT = args.rRT, lRT = args.lRT, outdir = outfolder)
     # Save transformation table
     tt.to_csv(os.path.join(args.outdir, "transTable.csv"), index = False)
     # Final benchmark

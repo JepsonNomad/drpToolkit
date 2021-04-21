@@ -152,6 +152,11 @@ def getArgs():
                         "'region_attributes'. See example data for sample ROI table "
                         "design.")
             
+    parser.add_argument("-o", "--outdir",
+        required=True,
+        help="REQUIRED: The name of a subdirectory to be added to imgDir "
+        "for writing panelized imagery and plots.") 
+            
     return parser.parse_args()
 
 
@@ -173,9 +178,10 @@ def main():
     imgFPs = glob.glob(args.globString)
     imgFPs = sorted(imgFPs)
     # Generate output plots
-    panelFolder = os.path.join(imDir, "panelized")
-    if not os.path.exists(panelFolder):
-	    os.mkdir(panelFolder)
+    outfolder = os.path.join(imDir, args.outdir)
+    print("Output folder: " + outfolder)
+    if not os.path.exists(outfolder):
+        os.mkdir(outfolder)
     foldPanelize(imgFPs = imgFPs, roiPolys = roiPolys, indicesDF = extract_df, outdir = panelFolder)
     # Final benchmark
     stopTime = datetime.now()

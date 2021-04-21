@@ -33,32 +33,35 @@ Inside the environment, install `drpToolkit` using pip:
 
 ![Package workflow](img/workflow.png)
 
-Module scripts can be called directly from the command line, and each script has some helpful documentation that's worth checking out before getting started:
+Inside the conda environment, module scripts can be called directly from the command line, and each script has some helpful documentation that's worth checking out before getting started:
 
 `prep -h`
 
+Navigate to a directory to get started, or use absolute paths when declaring input file information.
+
+`cd PATH/TO/data/`
+
 The workflow is as follows: First, prepare imagery for alignment by copying images to a new directory with filename based on image metadata, and (if desired) cropping and resizing to a smaller alignment window.
 
-`prep -i data/img -g '*.JPG' -s 'GB' -p '03' --xmin 0 --xmax 4224 --ymin 0 --ymax 2217 --width 4224  --height 2217 -o 'prepped'`
+`prep -i ./img -g '*.JPG' -s 'GB' -p '03' --xmin 0 --xmax 4224 --ymin 0 --ymax 2216 --width 2112 --height 1108 -o 'prepped'`
 
 Next, align images to a common reference image ("keyframe"). Note that the keyframe should match the resolution of the prepped imagery; it may be useful to select an image directly from the prepped imagery to use as a keyframe and, down the line, a basis for ROI definitions. The alignment step is computationally expensive and will take a while, especially for datasets that contain many pictures and/or datasets with large pictures. If desired, a reference image mask (-m) can be used, which defines acceptable areas of the image in which keypoints can be identified.
 
-`align -i data/img/prepped/ -k data/img/prepped/GB-03_2018_08_14_120000.JPG -o aligned`
+`align -i ./img/prepped/ -k ./roi/reference.JPG -o aligned`
 
-At this point I recommend checking the alignment. I use [ffmpeg](https://www.ffmpeg.org/) to compile all aligned images into a single time-lapse video using:
+At this point I recommend checking the alignment. I use [ffmpeg](https://www.ffmpeg.org/) to compile all aligned images into a single time-lapse video, e.g. using:
 
-`ffmpeg -pattern_type glob -i 'data/img/prepped/aligned/*.JPG' -r 12 -s hd1080 -crf 32 -vcodec h264 -pix_fmt yuv420p -loglevel warning './TIMELAPSE.mp4'`
+`ffmpeg -pattern_type glob -i './prepped/aligned/*.JPG' -r 12 -s hd1080 -crf 32 -vcodec h264 -pix_fmt yuv420p -loglevel warning './TIMELAPSE.mp4'`
 
 If the alignment looks good, greenness within a set of regions of interest can be extracted. Greenness extraction produces a [tidy](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) dataset with a row for each image/ROI pair (so nrows = nImg*nROI). 
 
-`extract -i data/img/prepped/aligned -g '*.JPG' -r data/roi/ROIs.csv`
+`extract -i ./prepped/aligned -g '*.JPG' -r ./roi/roi.csv`
 
 It's possible that you will get RuntimeWarnings during `extract` if an ROI overlaps with empty space in a realigned image. You can identify which region(s) lost coverage in the imagery using the `GCC.csv` output file from `extract` or from the `pd.DataFrame` returned by `extract.imgGCC()` and `extract.foldGCC()`.
 
 After extraction, users may wish to compile the data into a nicely formatted visualization. `drpToolkit` lends some support to this goal, by panelizing each image with the data leading up to the capture time of that image. The panelize script simultaneously imports ROIs (-r) using the same functionality as `extract`, and plots image indices in matching colors:
 
-`panelize -i PATH/TO/GB-03/prepped/aligned -t extract.csv -r PATH/TO/roi/roi.csv
-`
+`panelize -i ./prepped/aligned -t ./prepped/aligned/extract.csv -r ./rois/roi.csv -o panelized`
 
 The frames generated through this can then be compiled in a time-lapse video with the same  `ffmpeg` approach as was used for the aligned imagery.
 
