@@ -11,5 +11,5 @@ setup(
     license='Gnu GPL 3.0',
     description='Digital repeat photography imagery management and analysis',
     long_description=open('README.md').read(),
-    scripts=['drpToolkit_scripts/prep','drpToolkit_scripts/align','drpToolkit_scripts/extract','drpToolkit_scripts/panelize']
+    scripts=['drpToolkit/prep','drpToolkit/align','drpToolkit/extract','drpToolkit/panelize']
 )
