@@ -8,7 +8,7 @@ drpToolkit prep module
 Recommended Python 3.7.
 
 Author: Christian John
-April 2021
+August 2021
 GNU General Public License
 '''
 
@@ -19,7 +19,6 @@ import glob
 import json
 import shutil
 import exifread as ef
-import numpy as np
 import cv2 as cv
 import pandas as pd
 
@@ -168,6 +167,7 @@ def prepROI(roiFP):
             roi_arr = np.array([roi_tup], dtype=np.int32)
             myROI_arr.append(roi_arr)
     return roiIDs, roiSPs, myROI_arr
+
 
 
 # For command line scripting

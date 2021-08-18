@@ -4,12 +4,14 @@ channels:
 - defaults
 dependencies:
 - python=3.7.*
-- opencv=4.5.1
-- pip
-- pip:
-  - numpy==1.18.4
-  - pandas==1.1.3
-  - matplotlib==3.3.2
-  - imageio==2.9.0
-  - Pillow==8.0.0
-  - exifread==2.3.1
+- numpy=1.18.4
+- pandas=1.1.3
+- matplotlib=3.3.2
+- cv2=4.5.1
+- imagio=2.9.0
+- PIL=8.0.0
+- exifdata=2.3.1
+- glob
+- os
+- sys
+- shutil

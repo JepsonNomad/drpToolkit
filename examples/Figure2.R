@@ -146,8 +146,14 @@ fullTS_nLeg = GCC %>%
                 ymax = max(GCC)),
             fill = "grey80",
             col = "grey40") +
-  geom_line() +
-  geom_point() +
+  geom_segment(aes(x = as.Date("2019-07-04"),
+               xend = as.Date("2019-07-04"),
+               y = min(GCC),
+               yend = max(GCC)),
+               col = "grey60", alpha = 0.5,
+               lty = 2, size = 1) +
+  geom_line(size = 0.15) +
+  geom_point(size = 0.25) +
   xlab("Date") +
   ylab("Greenness") +
   scale_color_manual("",
@@ -171,21 +177,20 @@ subTS_wLeg = GCC %>%
              group = regionFac,
              col = species)) +
   facet_wrap(~Alignment) +
-  geom_line() +
-  geom_point() +
+  geom_line(size = 0.15) +
+  geom_point(size = 0.25) +
   annotate(geom = "text",
            x = as.POSIXct(as.Date("2018-11-12")),
            y = 0.39,
            label = "2018") +
   scale_y_continuous(breaks = c(0.30,0.33,0.36, 0.39),
-                     limits = c(0.3,
+                     limits = c(0.29,
                                 0.4)) +
   scale_color_manual("Species",
                      values = CJsBasics::KellyCols[2:20]) +
   ylab("Greenness") +
   CJsBasics::BasicTheme +
   theme(axis.title.x = element_blank())
-
 
 ## > Raster panels ----
 rasPlot = rasDF %>%

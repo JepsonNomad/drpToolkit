@@ -8,7 +8,7 @@ drpToolkit align module
 Recommended Python 3.7.
 
 Author: Christian John
-April 2021
+August 2021
 GNU General Public License
 '''
 
@@ -21,7 +21,7 @@ import cv2 as cv
 import pandas as pd
 
 
-def estimateTransform(newImage, refImage, refMask, transModel, rRT, lRT):
+def estimateTransform(newImage, refImage, refMask, transModel, rRT, lRT, summarizeTransformError):
     '''
     Estimate the transformation matrix between a novel image (newImage) 
     and reference image (refImage). If desired, a mask (refImMask) can 
@@ -64,9 +64,28 @@ def estimateTransform(newImage, refImage, refMask, transModel, rRT, lRT):
                 h, mask = cv.findHomography(points1, points2, method = cv.RANSAC, ransacReprojThreshold = rRT)
         else:
                 sys.exit("Invalid transModel selected. Check parameter definitions.")
+        
+        ## Interpret tranformation error by back-transforming points with homography matrix
+        if summarizeTransformError:
+            # Note discussion here: https://stackoverflow.com/questions/8600874/opencv-perspectivetransform-function-exception
+            y = cv.perspectiveTransform(points1[np.newaxis], h)[0]
+            # Create a vector and calculate
+            dst = np.zeros(len(y))
+            for i in range(0,len(y)):
+                dst[i] = np.sqrt((y[i,0] - points2[i,0])**2 + (y[i,1] - points2[i,1])**2)
+            projErrMean = np.mean(dst)
+            projErrMedian = np.median(dst)
+            # Check the distribution of reprojection squared error
+            # plt.hist(dst,200)
+            # plt.title("Distance between source points\nand reprojected new points")
+        else:
+            projErrMean = None
+            projErrMedian = None
     else:
         h = None
-    return h
+        projErrMean = None
+        projErrMedian = None      
+    return h, projErrMean, projErrMedian
 
 
 def applyTransform(img, h, transModel):
@@ -81,18 +100,19 @@ def applyTransform(img, h, transModel):
         imgReg = cv.warpPerspective(img, h, (width, height))
     else:
         sys.exit("Invalid transModel selected. Check parameter definitions.")
-        
     return imgReg
 
 
-def generateTransformTable(keyframeFP, imageFPs, refMaskFP, transModel, rRT, lRT, outdir):
+def generateTransformTable(keyframeFP, imageFPs, refMaskFP, transModel, rRT, lRT, summarizeTransformError, outdir):
     '''
     Generate a table with proposed transformation matrices for a set of imagery.
     Requires the filepath of a keyframe (keyframe) and a list of filepaths for
     imagery to be aligned (imageFPs). Also requires transformation estimation
     parameters passed directly to estimateTransform(). An output folder (outPath) 
     should point to a place to save aligned images, the keyframe mask, and 
-    transformation table.
+    transformation table. If summarizeTransformError is set to True (the default,
+    but slower), the transformation table will include mean and median distance 
+    between transformed keypoint coordinates and source keypoint coordinates.
     '''
     print("Generating transformation table...")
     ## Set up transform table and initialize transformation matrix
@@ -102,12 +122,12 @@ def generateTransformTable(keyframeFP, imageFPs, refMaskFP, transModel, rRT, lRT
     elif transModel == "Homography":
         hCols = ["h"+str(i) for i in range(1,10)]
         hLast = np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
-    
+    # Create column names
     ttColsBase = ["fileName", "transModel"]
-    ttColNames = ttColsBase + hCols
-    # print(ttColNames)
+    ttColNames = ttColsBase + hCols + ["projErrMean", "projErrMedian"]
+    #print(ttColNames)
     transformTable = pd.DataFrame(columns = ttColNames)
-    # print(transformTable)
+    #print(transformTable)
     ## Import keyframe
     refImage = cv.imread(keyframeFP)
     if refMaskFP is not None:
@@ -123,7 +143,9 @@ def generateTransformTable(keyframeFP, imageFPs, refMaskFP, transModel, rRT, lRT
         imgBN = os.path.basename(q)
         # print("Input image: " + imgBN)
         newImage = cv.imread(q)
-        h = estimateTransform(newImage = newImage, refImage = refImage, refMask = refMask, transModel = transModel, rRT = rRT, lRT = lRT)
+        h, projErrMean, projErrMedian = estimateTransform(newImage = newImage, refImage = refImage, refMask = refMask, transModel = transModel, rRT = rRT, lRT = lRT, summarizeTransformError = summarizeTransformError)
+        #print("Transformation info")
+        #print((h, projErrMean, projErrMedian))
         if h is not None:
             if abs(np.linalg.det(h) - 1) < 0.1:
                 imgReg = applyTransform(img = newImage, h = h, transModel = transModel)
@@ -139,7 +161,9 @@ def generateTransformTable(keyframeFP, imageFPs, refMaskFP, transModel, rRT, lRT
         # print(np.round(hLast,2))
         # Prep transformation matrix for export
         hFlat = hLast.flatten().tolist()
-        dfRow = [imgBN, transModel] + hFlat
+        dfRow = [imgBN, transModel] + hFlat + [projErrMean, projErrMedian]
+        #print("dfRow")
+        #print(dfRow)
         dfSeries = pd.Series(dfRow, index = ttColNames)
         # Append image name, transformation model, and transformation matrix to table
         transformTable = transformTable.append(dfSeries, ignore_index=True)
@@ -152,8 +176,41 @@ def generateTransformTable(keyframeFP, imageFPs, refMaskFP, transModel, rRT, lRT
     return transformTable    
 
 
-# For command line scripting:
+def transformFromTable(imageFPs, transTableFP, transModel, outdir):
+    '''
+    Use a transformation table (*.csv) to apply a transformation to a series of 
+    images, using an affine or homography transformation model. The transformation
+    table should include columns titled 'h1' through 'h6' if using Affine, or 'h1'
+    through 'h9' if using Homography transformations.
+    '''
+    tt = pd.read_csv(transTableFP)
+    imCounter = 0
+    numImgs = len(imageFPs)
+    for q in imageFPs:
+        imCounter = imCounter + 1
+        if imCounter % 50 == 0:
+            print("Transforming image " + str(imCounter) + " of " + str(numImgs))
+        imgBN = os.path.basename(q)
+        # print("Input image: " + imgBN)
+        newImage = cv.imread(q)
+        ttRow = tt[tt['fileName'] == imgBN]
+        # Convert values from the transformation table row to an homography matrix
+        if transModel == "Affine":
+            hFlat = ttRow.loc[:,'h1':'h6'].to_numpy()
+        elif transModel == "Homography":
+            hFlat = ttRow.loc[:,'h1':'h9'].to_numpy()
+    	# Reshape numpy array to useful matrix shape
+        h = np.reshape(hFlat, (-1,3))
+        # Transform the image
+        imgReg = applyTransform(img = newImage, h = h, transModel = transModel)
+        ## Save transformed image
+        outpath = os.path.join(outdir, imgBN)
+        # print("Output image path: " + outpath)
+        cv.imwrite(outpath, imgReg)
 
+
+
+# For command line scripting:
 def getArgs():
     """
     Get args from cmd line
@@ -204,7 +261,13 @@ def getArgs():
         type = float,
         required=False,
         default=0.7,
-        help="OPTIONAL: Lowe's ratio threshold.")  
+        help="OPTIONAL: Lowe's ratio threshold.") 
+        
+    parser.add_argument("-s", "--summarizeTransformError",
+        type = bool,
+        required=False,
+        default=True,
+        help="OPTIONAL: Include summarized reprojection error in transformation table.") 
            
     parser.add_argument("-o", "--outdir",
         required=True,
@@ -212,6 +275,7 @@ def getArgs():
         "for writing aligned imagery.") 
             
     return parser.parse_args()
+
 
 def main():
     # Get arguments
@@ -233,12 +297,13 @@ def main():
     if not os.path.exists(outfolder):
 	    os.mkdir(outfolder)
     # Identify transform
-    tt = generateTransformTable(keyframeFP = keyframeFullPath, imageFPs = imgFPs, refMaskFP = args.refMaskFP, transModel = args.transModel, rRT = args.rRT, lRT = args.lRT, outdir = outfolder)
+    tt = generateTransformTable(keyframeFP = keyframeFullPath, imageFPs = imgFPs, refMaskFP = args.refMaskFP, transModel = args.transModel, rRT = args.rRT, lRT = args.lRT, summarizeTransformError = args.summarizeTransformError, outdir = outfolder)
     # Save transformation table
     tt.to_csv(os.path.join(args.outdir, "transTable.csv"), index = False)
     # Final benchmark
     stopTime = datetime.now()
     print("Elapsed time: " + str(stopTime - startTime))
+
 
 if __name__ == '__main__':
     main()

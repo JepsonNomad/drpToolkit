@@ -9,6 +9,6 @@ __email__ = "cjohn@ucdavis.edi"
 
 
 from drpToolkit.prep import exifReadWrite, applyExifFolder, alignCrop, prepROI
-from drpToolkit.align import estimateTransform, applyTransform, generateTransformTable
+from drpToolkit.align import estimateTransform, applyTransform, generateTransformTable, transformFromTable
 from drpToolkit.extract import imgGCC, imgNDSI, imgIndices, foldIndices
 from drpToolkit.panelize import imgPanelize, foldPanelize

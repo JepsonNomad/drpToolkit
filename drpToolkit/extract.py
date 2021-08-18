@@ -8,7 +8,7 @@ drpToolkit extract module
 Recommended Python 3.7.
 
 Author: Christian John
-April 2021
+August 2021
 GNU General Public License
 '''
 

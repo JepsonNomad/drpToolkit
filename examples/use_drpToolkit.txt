@@ -1,11 +1,8 @@
-# Navigate to directory
-cd PATH/TO/DIR
-
 # Use toolkit
-prep -i ./img -g '*.JPG' -s 'GB' -p '03' --xmin 0 --xmax 4224 --ymin 0 --ymax 2216 --width 2112 --height 1108 -o 'prepped'
-align -i ./img/prepped/ -k ./roi/reference.JPG -o aligned
-extract -i ./img/prepped/aligned -g '*.JPG' -r ./roi/roi.csv
-panelize -i ./img/prepped/aligned -t ./img/prepped/aligned/extract.csv -r ./roi/roi.csv -o panelized
+python3 drpToolkit/drpToolkit_scripts/prep.py -i PATH/TO/GB-03 -g *.JPG -s GB -p 03 --xmin 0 --xmax 4224 --ymin 0 --ymax 2216 --width 2104 --height 1108 -o prepped
+python3 drpToolkit/drpToolkit_scripts/align.py -i PATH/TO/GB-03/prepped -g *.JPG -k PATH/TO/roi/reference.JPG -o aligned
+python3 drpToolkit/drpToolkit_scripts/extract.py -i PATH/TO/GB-03/prepped/aligned -g *.JPG -s SW -p 04 -r PATH/TO/roi/roi.csv
+python3 drpToolkit/drpToolkit_scripts/panelize.py -i PATH/TO/GB-03/prepped/aligned -t extract.csv -r PATH/TO/roi/roi.csv
 
 # And if you want, compile into a timelapse video:
-# ffmpeg -pattern_type glob -i ./img/prepped/aligned/panelized/*.JPG -r 12 -s hd1080 -crf 32 -vcodec h264 -pix_fmt yuv420p -loglevel warning TIMELAPSE_panelized_1200.mp4
+# ffmpeg -pattern_type glob -i PATH/TO/GB-03/prepped/aligned/panelized/*.JPG -r 12 -s hd1080 -crf 32 -vcodec h264 -pix_fmt yuv420p -loglevel warning PATH/TO/GB-03/TIMELAPSE_panelized_1200.mp4

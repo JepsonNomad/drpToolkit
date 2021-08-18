@@ -4,9 +4,9 @@
 
 drpToolkit is a digital repeat photography ("time-lapse") imagery management and analysis package for Python. With this package, you can:
 
-- Get imagery into a useful file structure (`drpToolkit.prep`)
-- Align imagery to a common keyframe (`drpToolkit.align`)
-- Extract greenness from regions of interest (`drpToolkit.extract`)
+*Get imagery into a useful file structure (`prep.py`)
+*Align imagery to a common keyframe (`align.py`)
+*Extract greenness from regions of interest (`extract.py`)
 
 The motivation for this is my own work applying digital repeat photography in phenology research. There are several other applications for which it may be useful, in particular those with goals relating to change detection.
 
@@ -20,55 +20,42 @@ For now, please cite the github package directly.
 
 `drpToolkit` was designed in Python 3.7, so please be sure to have a  recent Python version before trying to use it. It also has several dependencies, which are listed in `drpToolkit_conda_env.yml`. These can all be installed at once using a `conda` virtual environment (requires [Anaconda](https://www.anaconda.com/products/individual)):
 
-`conda env create -f drpToolkit_conda_env.yml`
+`conda create -f drpToolkit_conda_env.yml`
 
 `conda activate drpToolkit`
 
-Inside the environment, install `drpToolkit` using pip:
-
-`pip3 install git+https://github.com/JepsonNomad/drpToolkit.git`
+Once the environment is activated, you can use the scripts in `drpToolkit_scripts/`. To call functions directly in Python, you will need to install using pip.
 
 
 ## Examples
 
 ![Package workflow](img/workflow.png)
 
-Inside the conda environment, module scripts can be called directly from the command line, and each script has some helpful documentation that's worth checking out before getting started:
+Module scripts can be called directly from the command line, and each script has some helpful documentation that's worth checking out before getting started:
 
-`prep -h`
-
-Navigate to a directory to get started, or use absolute paths when declaring input file information.
-
-`cd PATH/TO/data/`
+`python3 prep.py -h`
 
 The workflow is as follows: First, prepare imagery for alignment by copying images to a new directory with filename based on image metadata, and (if desired) cropping and resizing to a smaller alignment window.
 
-`prep -i ./img -g '*.JPG' -s 'GB' -p '03' --xmin 0 --xmax 4224 --ymin 0 --ymax 2216 --width 2112 --height 1108 -o 'prepped'`
+`python3 prep.py -i data/img -g *.JPG -s 'GB' -p '03' --xmin 0 --xmax 4224 --ymin 0 --ymax 2217 --width 4224  --height 2217 -o 'prepped'`
 
-Next, align images to a common reference image ("keyframe"). Note that the keyframe should match the resolution of the prepped imagery; it may be useful to select an image directly from the prepped imagery to use as a keyframe and, down the line, a basis for ROI definitions. The alignment step is computationally expensive and will take a while, especially for datasets that contain many pictures and/or datasets with large pictures. If desired, a reference image mask (-m) can be used, which defines acceptable areas of the image in which keypoints can be identified.
+Next, align images to a common reference image ("keyframe"). This step is computationally expensive and will take a while, especially for datasets that contain many pictures and/or datasets with large pictures. If desired, a reference image mask (-m) can be used, which defines acceptable areas of the image in which keypoints can be identified.
 
-`align -i ./img/prepped/ -k ./roi/reference.JPG -o aligned`
+`python3 align.py -i data/img/prepped/ -k data/img/prepped/GB-03_2018_08_14_120000.JPG -o aligned`
 
-At this point I recommend checking the alignment. I use [ffmpeg](https://www.ffmpeg.org/) to compile all aligned images into a single time-lapse video, e.g. using:
+At this point I recommend checking the alignment. I use [ffmpeg](https://www.ffmpeg.org/) to compile all aligned images into a single time-lapse video using:
 
-`ffmpeg -pattern_type glob -i './img/prepped/aligned/*.JPG' -r 12 -s hd1080 -crf 32 -vcodec h264 -pix_fmt yuv420p -loglevel warning './TIMELAPSE.mp4'`
+`ffmpeg -pattern_type glob -i 'data/img/prepped/aligned/*.JPG' -r 12 -s hd1080 -crf 32 -vcodec h264 -pix_fmt yuv420p -loglevel warning './TIMELAPSE.mp4'`
 
 If the alignment looks good, greenness within a set of regions of interest can be extracted. Greenness extraction produces a [tidy](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) dataset with a row for each image/ROI pair (so nrows = nImg*nROI). 
 
-`extract -i ./img/prepped/aligned -g '*.JPG' -r ./roi/roi.csv`
+`python3 extract.py -i data/img/prepped/aligned -g *.JPG -r data/roi/ROIs.csv`
 
-It's possible that you will get RuntimeWarnings during `extract` if an ROI overlaps with empty space in a realigned image. You can identify which region(s) lost coverage in the imagery using the `GCC.csv` output file from `extract` or from the `pd.DataFrame` returned by `extract.imgGCC()` and `extract.foldGCC()`.
-
-After extraction, users may wish to compile the data into a nicely formatted visualization. `drpToolkit` lends some support to this goal, by panelizing each image with the data leading up to the capture time of that image. The panelize script simultaneously imports ROIs (-r) using the same functionality as `extract`, and plots image indices in matching colors:
-
-`panelize -i ./img/prepped/aligned -t ./img/prepped/aligned/extract.csv -r ./roi/roi.csv -o panelized`
-
-The frames generated through this can then be compiled in a time-lapse video with the same  `ffmpeg` approach as was used for the aligned imagery.
-
+It's possible that you will get RuntimeWarnings during `extract.py` if an ROI overlaps with empty space in a realigned image. You can identify which region(s) lost coverage in the imagery using the `GCC.csv` output file from `extract.py` or from the `pd.DataFrame` returned by `extract.imgGCC()` and `extract.foldGCC()`.
 
 ## Version
 
-The current version is v0.0.0.9000. With feedback from peer review, we will update the software and release v0.0.1.
+The current version is v0.0.1. With feedback from peer review, we will update the software and release v0.1.0.
 
 
 ## License
