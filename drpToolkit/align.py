@@ -186,6 +186,9 @@ def transformFromTable(imageFPs, transTableFP, transModel, outdir):
     tt = pd.read_csv(transTableFP)
     imCounter = 0
     numImgs = len(imageFPs)
+    outfolder = os.path.join(os.getcwd(), outdir)
+    if not os.path.exists(outfolder):
+        os.mkdir(outfolder)
     for q in imageFPs:
         imCounter = imCounter + 1
         if imCounter % 50 == 0:
@@ -204,7 +207,7 @@ def transformFromTable(imageFPs, transTableFP, transModel, outdir):
         # Transform the image
         imgReg = applyTransform(img = newImage, h = h, transModel = transModel)
         ## Save transformed image
-        outpath = os.path.join(outdir, imgBN)
+        outpath = os.path.join(outfolder, imgBN)
         # print("Output image path: " + outpath)
         cv.imwrite(outpath, imgReg)
 
