@@ -1,15 +1,16 @@
-cff-version: 1.0.0
+cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-  - family-names: John
-    given-names: Christian
-    orcid: https://orcid.org/0000-0002-6249-040X
-  - family-names: Shilling
-    given-names: Fraser
-    orcid: https://orcid.org/0000-0001-8125-2186
-  - family-names: Post
-    given-names: Eric
-    orcid: https://orcid.org/0000-0002-9471-5351
-title: JepsonNomad/drpToolkit: First drpToolkit release
-version: v1.0.0
+- family-names: "John"
+  given-names: "Christian"
+  orcid: "https://orcid.org/0000-0002-6249-040X"
+- family-names: "Shilling"
+  given-names: "Fraser"
+  orcid: "https://orcid.org/0000-0001-8125-2186"
+- family-names: "Post"
+  given-names: "Eric"
+  orcid: "https://orcid.org/0000-0002-9471-5351"
+title: "JepsonNomad/drpToolkit: First drpToolkit release"
+version: 1.0.0
+doi: 10.5281/zenodo.5517957
 date-released: 2021-09-20
