@@ -55,7 +55,7 @@ It's possible that you will get RuntimeWarnings during `extract.py` if an ROI ov
 
 ## Version
 
-The current version is v0.1.0.
+The current version is v1.0.0.
 
 
 ## License
