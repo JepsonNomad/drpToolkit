@@ -13,7 +13,7 @@ The motivation for this is my own work applying digital repeat photography in ph
 
 ## Citation
 
-Please cite our accepted article in Methods in Ecology and Evolution, *drpToolkit: An automated workflow for aligning and analyzing vegetation and ground surface time series imagery*.
+Please cite our accepted article in [Methods in Ecology and Evolution, *drpToolkit: An automated workflow for aligning and analyzing vegetation and ground surface time series imagery*](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13730).
 
 
 ## Installation
