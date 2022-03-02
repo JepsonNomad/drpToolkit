@@ -7,7 +7,7 @@ setup(
     author_email='cjohn@ucdavis.edu',
     packages=['drpToolkit'],
     install_requires=['numpy'],
-    version='1.0.0',
+    version='1.0.0.9999',
     license='Gnu GPL 3.0',
     description='Digital repeat photography imagery management and analysis',
     long_description=open('README.md').read(),

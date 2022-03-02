@@ -155,7 +155,7 @@ def generateTransformTable(keyframeFP, imageFPs, refMaskFP, transModel, rRT, lRT
         if h is not None:
             if transModel == "Affine":
                 hRev = h[:2,:2] # Need a square matrix to calculate determinant
-            elif: transModel == "Homography":
+            elif transModel == "Homography":
                 hRev = h
             if abs(np.linalg.det(hRev) - 1) < 0.1:
                 imgReg = applyTransform(img = newImage, h = h, transModel = transModel)
@@ -281,9 +281,9 @@ def getArgs():
         help="OPTIONAL: Lowe's ratio threshold.") 
         
     parser.add_argument("-s", "--summarizeTransformError",
-        type = bool,
         required=False,
-        action='store_true', default=False,
+        action='store_true', 
+        default=False,
         help="OPTIONAL: Include summarized reprojection error in transformation table.") 
            
     parser.add_argument("-o", "--outdir",
