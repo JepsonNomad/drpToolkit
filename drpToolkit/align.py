@@ -9,6 +9,7 @@ Recommended Python 3.7.
 
 Author: Christian John
 August 2021
+Updated 2 Mar 2022
 GNU General Public License
 '''
 
@@ -68,7 +69,12 @@ def estimateTransform(newImage, refImage, refMask, transModel, rRT, lRT, summari
         ## Interpret tranformation error by back-transforming points with homography matrix
         if summarizeTransformError:
             # Note discussion here: https://stackoverflow.com/questions/8600874/opencv-perspectivetransform-function-exception
-            y = cv.perspectiveTransform(points1[np.newaxis], h)[0]
+            if transModel == "Affine":
+                y = cv.transform(points1[np.newaxis], h)[0]
+            elif transModel == "Homography":
+                y = cv.perspectiveTransform(points1[np.newaxis], h)[0]
+            else:
+                sys.exit("Invalid transModel selected. Check parameter definitions.")
             # Create a vector and calculate
             dst = np.zeros(len(y))
             for i in range(0,len(y)):
@@ -147,7 +153,11 @@ def generateTransformTable(keyframeFP, imageFPs, refMaskFP, transModel, rRT, lRT
         #print("Transformation info")
         #print((h, projErrMean, projErrMedian))
         if h is not None:
-            if abs(np.linalg.det(h) - 1) < 0.1:
+            if transModel == "Affine":
+                hRev = h[:2,:2] # Need a square matrix to calculate determinant
+            elif: transModel == "Homography":
+                hRev = h
+            if abs(np.linalg.det(hRev) - 1) < 0.1:
                 imgReg = applyTransform(img = newImage, h = h, transModel = transModel)
                 hLast = h
                 # print("Proposed transformation matrix:")
@@ -184,6 +194,7 @@ def transformFromTable(imageFPs, transTableFP, transModel, outdir):
     through 'h9' if using Homography transformations.
     '''
     tt = pd.read_csv(transTableFP)
+    ttImgs = tt.loc[:,'fileName'].to_list()
     imCounter = 0
     numImgs = len(imageFPs)
     outfolder = os.path.join(os.getcwd(), outdir)
@@ -195,21 +206,24 @@ def transformFromTable(imageFPs, transTableFP, transModel, outdir):
             print("Transforming image " + str(imCounter) + " of " + str(numImgs))
         imgBN = os.path.basename(q)
         # print("Input image: " + imgBN)
-        newImage = cv.imread(q)
-        ttRow = tt[tt['fileName'] == imgBN]
-        # Convert values from the transformation table row to an homography matrix
-        if transModel == "Affine":
-            hFlat = ttRow.loc[:,'h1':'h6'].to_numpy()
-        elif transModel == "Homography":
-            hFlat = ttRow.loc[:,'h1':'h9'].to_numpy()
-    	# Reshape numpy array to useful matrix shape
-        h = np.reshape(hFlat, (-1,3))
-        # Transform the image
-        imgReg = applyTransform(img = newImage, h = h, transModel = transModel)
-        ## Save transformed image
-        outpath = os.path.join(outfolder, imgBN)
-        # print("Output image path: " + outpath)
-        cv.imwrite(outpath, imgReg)
+        if imgBN in ttImgs:
+            newImage = cv.imread(q)
+            ttRow = tt[tt['fileName'] == imgBN]
+            # Convert values from the transformation table row to an homography matrix
+            if transModel == "Affine":
+                hFlat = ttRow.loc[:,'h1':'h6'].to_numpy()
+            elif transModel == "Homography":
+                hFlat = ttRow.loc[:,'h1':'h9'].to_numpy()
+                # print(hFlat)
+        	# Reshape numpy array to useful matrix shape
+            h = np.reshape(hFlat, (-1,3))
+            # print(h)
+            # Transform the image
+            imgReg = applyTransform(img = newImage, h = h, transModel = transModel)
+            ## Save transformed image
+            outpath = os.path.join(outfolder, imgBN)
+            # print("Output image path: " + outpath)
+            cv.imwrite(outpath, imgReg)
 
 
 
@@ -269,7 +283,7 @@ def getArgs():
     parser.add_argument("-s", "--summarizeTransformError",
         type = bool,
         required=False,
-        default=True,
+        action='store_true', default=False,
         help="OPTIONAL: Include summarized reprojection error in transformation table.") 
            
     parser.add_argument("-o", "--outdir",

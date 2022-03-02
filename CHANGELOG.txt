@@ -1,0 +1,28 @@
+CHANGELOG
+
+2 March 2022
+
+Issues:
+
+1. In align.py -> estimateTransform(), alignment fails under transModel = Affine because 
+   cv.perspectiveTransform() will not return a set of coordinate pairs if h is a 2x3 
+   matrix. This results in an error on Line 75 (but the origin of the problem is Line 71)
+2. In align.py -> generateTransformTable(), calculating the determinant of the 
+   transformation matrix fails under transModel = Affine because you can't take the
+   determinant of a non-square matrix.
+3. In the align.py argument summarizeTransformError, Python is somewhat unintuitive
+   about its use of boolean inputs. Impossible to turn off the summarize step right now
+   because command line arguments are stored as strings and "False" is True.
+
+Solutions:
+
+1. Add an if/else to estimateTransform() -> summarizeTransformError() wherein the 
+   reprojected points from newImg (i.e. y which comes from points1) are generated
+   using cv.perspectiveTransform() when transModel = Homography but using
+   cv.transform() when transModel = Affine.
+2. Add an if/else statement in generateTransformTable() wherein the top-left 2x2
+   subset of the transformation matrix is retained for determinant calculation if
+   transModel = Affine; use the full 3x3 matrix if transModel = Homography.
+3. Revise the default to false, and then action to 'store_true' so that when the
+   -s flag is included, transformError is summarized, and without the -s flag no 
+   transform error is included.
