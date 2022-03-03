@@ -5,7 +5,7 @@ __copyright__ = "Copyright 2021, drpToolkit"
 __credits__ = ["Christian John"]
 __license__ = "Gnu GPL 3.0"
 __maintainer__ = "Christian John"
-__email__ = "cjohn@ucdavis.edi"
+__email__ = "cjohn@ucdavis.edu"
 
 
 from drpToolkit.prep import exifReadWrite, applyExifFolder, alignCrop, prepROI
