@@ -20,7 +20,7 @@ Please cite our accepted article in [Methods in Ecology and Evolution, *drpToolk
 
 `drpToolkit` was designed in Python 3.7, so please be sure to have a  recent Python version before trying to use it. It also has several dependencies, which are listed in `drpToolkit_conda_env.yml`. These can all be installed at once using a `conda` virtual environment (requires [Anaconda](https://www.anaconda.com/products/individual)):
 
-`conda create -f drpToolkit_conda_env.yml`
+`conda env create -f drpToolkit_conda_env.yml`
 
 `conda activate drpToolkit`
 
